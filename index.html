@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Autocomplete</title>
+
+    <style>
+
+        html, body {
+            font-family: Verdana, Geneva, Tahoma, sans-serif;
+            letter-spacing: -1px;
+        }
+
+        .container {
+            width: 50%;
+        }
+
+        div.textarea {
+            border: 1px solid black;
+            padding: 10px;
+            display: flex;
+            flex-wrap: wrap;
+        }
+
+        div.textarea input {
+            padding: 5px;
+            border: 0;
+            max-width: 100px;
+        }
+
+        .filtered-list > div {
+            border: 1px solid #eee;
+            padding: 5px 10px;
+            cursor: pointer;
+            transition: background 0.6s ease;
+        }
+
+        .filtered-list > div:nth-child(odd) {
+            background: #eee;
+        }
+
+        .filtered-list > div:hover {
+            background: #999;
+        }
+
+        span {
+            display: inline-block;
+            background: lightgrey;
+            padding: 5px;
+            cursor: pointer;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+
+        span::after {
+            content: "X";
+            font-size: 0.4em;
+            margin-left: 5px;
+            position: relative;
+            top: -9px;
+            background: darkgreen;
+            padding: 2px;
+            color: white;
+            right: -2px;
+        }
+        
+    </style>
+</head>
+<body>
+    
+    <div class="container">
+        <h2>Filter Options</h2>
+        <div class="textarea">
+            <input type="text" class="inputField">
+        </div>
+        <div class="filtered-list">
+        </div>
+    </div>
+
+    <script>
+        const data = ['Pacita', 'Sampaguita', 'Sampaloc', 'Alabang', 'Paloma', 'Palingo', 'Santan', 'Quezon City', 'Cavite'];
+        let filteredArr = [];
+        const filteredContainer = document.querySelector('.filtered-list');
+        const textarea = document.querySelector('.textarea');
+        textarea.addEventListener('click', () => {
+            inputField.focus();
+        })
+
+        const inputField = document.querySelector('.inputField');
+        inputField.addEventListener('keyup', (e) => {
+            filterList(e)
+        });
+
+        function filterList(event) {
+            filteredArr = [];
+            let filterSearch = event.target.value.trim();
+            if(filterSearch == '') {
+                deleteNodes();
+                filteredArr = [];
+                return;
+            }
+
+            for(item of data) {
+                /* --- if using regex ---
+                if(item.toLowerCase().match(new RegExp(filterSearch.toLowerCase(), 'gi'))) {
+                    filteredArr.push(item);
+                }
+                */
+                if(item.toLowerCase().indexOf(filterSearch.toLowerCase()) != -1) {
+                    filteredArr.push(item);
+                }
+            }
+
+            // Delete all nodes before filtering
+            deleteNodes();
+
+            for(item of filteredArr) {
+                const div = document.createElement('div');
+                div.setAttribute('data-item', item)
+                const p = document.createElement('p');
+                p.innerHTML = item;
+
+                div.appendChild(p);
+                div.addEventListener('click', () => {
+                    addItem(div);
+                });
+
+                filteredContainer.appendChild(div);
+            }
+        }
+
+        function addItem(el) {
+            const span = document.createElement('span');
+            span.innerHTML = el.dataset.item;
+            span.addEventListener('click', () => {
+                span.remove();
+            })
+            textarea.appendChild(span);
+            textarea.appendChild(inputField);
+
+            inputField.value = "";
+            deleteNodes();
+            filteredArr = [];
+        }
+
+        function deleteNodes() {
+            filteredContainer.querySelectorAll('*').forEach(item => item.remove());
+        }
+    </script>
+    
+</body>
+</html>
